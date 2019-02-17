@@ -6,4 +6,4 @@
 
 ## 目录
 
-### [LGC](notebook/lgc.md)
+### LGC: [Learning with Local and Global Consistency](notebook/lgc.md)
