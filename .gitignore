@@ -1,0 +1,17 @@
+**/.ipynb_checkpoints
+**/__pycache__
+*.params
+*.DS_Store
+*.csv
+*egg-info*
+**/build
+*.spec
+*.h5
+*.h5c
+*.npy
+**/draft
+*.zip
+**/models
+*.docx
+**/data
+**/draft
