@@ -5,5 +5,7 @@
 [^1]: Zhou D, Bousquet O, Lal T N, et al. Learning with Local and Global Consistency[C]. neural information processing systems, 2003: 321-328.
 
 - [networkx 实现](https://networkx.github.io/documentation/stable/reference/algorithms/generated/networkx.algorithms.node_classification.lgc.local_and_global_consistency.html)
-
+- [sklearn 实现](http://sklearn.apachecn.org/#/docs/15)
+- [sklearn 实现](https://scikit-learn.org/stable/modules/label_propagation.html)
 - [Wittawat Jitkrittum 解读](https://pdfs.semanticscholar.org/1a55/01b537d94178c723ee475a59e3345e9e89c8.pdf)
+- [LGC 简单实现](lgc.ipynb)
