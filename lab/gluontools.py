@@ -86,7 +86,7 @@ def train(ctx,
         print(epoch_s + time_s)
         train_history.update([1 - train_acc, 1 - val_acc])  # 更新图像的纵轴
         train_history.plot(save_path=f'{resultDir}/{modelName}_history.png')  # 实时更新图像
-        if abs(train_acc-val_acc)>.25:  # 严重过拟合
+        if abs(train_acc-val_acc)>.2:  # 严重过拟合
             break
         if val_acc > best_val_score:  # 保存比较好的模型
             best_val_score = val_acc
