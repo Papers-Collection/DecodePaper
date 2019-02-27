@@ -61,37 +61,33 @@ def train(ctx,
     best_val_score = 0
     modelDir, resultDir = get_result_dirs(datasetName)
     for epoch in range(num_epochs):
-        train_l_sum, n, start = 0.0, 0, time.time()  # 计时开始
+        train_l_batch, start = 0.0, time.time()  # 计时开始
         train_metric.reset()
         for X, y in train_iter:
             X = X.as_in_context(ctx)
             y = y.as_in_context(ctx).astype('float32')  # 模型的输出是 float32 类型数据
             with autograd.record():  # 记录梯度信息
                 outputs = net(X)  # 模型输出
-                L = loss(outputs, y)
-                l = L.mean()  # 计算总损失
+                l = loss(outputs, y).mean()  # 计算平均损失
             l.backward()  # 反向传播
             trainer.step(1)
-            train_l_sum += L.sum().asscalar()  # 计算该批量的总损失
+            train_l_batch += l.asscalar()  # 计算该批量的总损失
             train_metric.update(y, outputs)  # 计算训练精度
-            n += y.size
         _, train_acc = train_metric.get()
         time_s = "time {:.2f} sec".format(time.time() - start)  # 计时结束
         valid_loss = evaluate_loss(valid_iter, net, ctx, loss)  # 计算验证集的平均损失
         _, val_acc = test(valid_iter, net, ctx)  # 计算验证集的精度
         epoch_s = (
             "epoch {:d}, train loss {:.5f}, valid loss {:.5f}, train acc {:.5f}, valid acc {:.5f}, ".
-            format(n_retrain_epoch + epoch, train_l_sum / n, valid_loss,
-                   train_acc, val_acc))
+            format(n_retrain_epoch + epoch, train_l_batch, valid_loss, train_acc, val_acc))
         print(epoch_s + time_s)
         train_history.update([1 - train_acc, 1 - val_acc])  # 更新图像的纵轴
         train_history.plot(save_path=f'{resultDir}/{modelName}_history.png')  # 实时更新图像
-        if abs(train_acc-val_acc)>.2:  # 严重过拟合
-            break
         if val_acc > best_val_score:  # 保存比较好的模型
             best_val_score = val_acc
             net.save_parameters('{}/{:.4f}-{}-{:d}-best.params'.format(
                 modelDir, best_val_score, modelName, n_retrain_epoch + epoch))
+    return train_history
 
 
 def train_fine_tuning(datasetName,
@@ -111,5 +107,4 @@ def train_fine_tuning(datasetName,
         'learning_rate': learning_rate,
         'wd': 0.001
     })
-    train(ctx, loss, trainer, datasetName, modelName, net, train_iter,
-          valid_iter, num_epochs, n_retrain_epoch)
+    return train(ctx, loss, trainer, datasetName, modelName, net, train_iter, valid_iter, num_epochs, n_retrain_epoch)

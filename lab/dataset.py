@@ -6,6 +6,11 @@ from mxnet.gluon.data.vision import transforms as gtf
 
 from datatools import Loader
 
+def split(X, Y, test_size):
+    from sklearn.model_selection import train_test_split
+    # 数据集划分操作
+    return train_test_split(X, Y, test_size=test_size, shuffle=True)
+
 # 数据增强
 transform_train = gtf.Compose([
     # 随机对图像裁剪出面积为原图像面积0.08~1倍、且高和宽之比在3/4~4/3的图像，再放缩为高和
@@ -32,13 +37,13 @@ transform_test = gtf.Compose([
 
 
 class SimpleDataset:
-    def __init__(self, name, numLabels, root='E:/xdata/X.h5'):
+    def __init__(self, name, root='E:/xdata/X.h5'):
         import tables as tb
         h5 = tb.open_file(root)
         self.name = name
         self._dataset = h5.root[name]
         self.label_names = self._get_label_names(is_fine_labels=False)
-        self._split(numLabels)
+        self.trainX, self.trainY = self._dataset.trainX[:], self._dataset.trainY[:]
         self.testX, self.testY = self._dataset.testX[:], self._dataset.testY[:]
         h5.close()
 
@@ -50,19 +55,10 @@ class SimpleDataset:
         else:
             return np.asanyarray(self._dataset.coarse_label_names, dtype='U')
 
-    def _split(self, numLabels):
-        from sklearn.model_selection import train_test_split
-        xTr = self._dataset.trainX[:]
-        yTr = self._dataset.trainY[:]
-        test_size = xTr.shape[0] - numLabels
-        # 数据集划分操作
-        self.trainX, self.valX, self.trainY, self.valY = train_test_split(
-            xTr, yTr, test_size=test_size, shuffle=True)
-
 
 class AugLoader(Loader, gdata.Dataset):
-    def __init__(self, batch_size, X, Y=None, shuffle=True, *args, **kwargs):
-        super().__init__(batch_size, X, Y=None, shuffle=True, *args, **kwargs)
+    def __init__(self, batch_size, X, Y=None, shuffle=False, *args, **kwargs):
+        super().__init__(batch_size, X, Y, shuffle, *args, **kwargs)
         self.X = nd.array(X[:])
         if not Y is None:
             self.Y = nd.array(Y[:])
@@ -86,3 +82,31 @@ class AugLoader(Loader, gdata.Dataset):
                 yield self.aug_imgs(self.X.take(K, 0))
             else:
                 yield self.aug_imgs(self.X.take(K, 0)), self.Y.take(K, 0)
+
+class FlexiableLoader:
+    def __init__(self, batch_size, X, Y, shuffle=False):
+        self._X = X
+        self._Y = Y
+        self._batch_size = batch_size
+        self._shuffle = shuffle
+
+    @property
+    def X(self):
+        return self._X
+
+    @X.setter
+    def X(self, value):
+        self._X = value
+
+    @property
+    def Y(self):
+        return self._Y
+
+    @Y.setter
+    def Y(self, value):
+        self._Y = value
+
+    @property
+    def dataset(self):
+        return AugLoader(
+            self._batch_size, self._X, self._Y, self._shuffle)
