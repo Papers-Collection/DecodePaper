@@ -4,7 +4,7 @@ from mxnet import nd
 from mxnet.gluon import data as gdata
 from mxnet.gluon.data.vision import transforms as gtf
 
-from datatools import Loader
+from .datatools import Loader
 
 def split(X, Y, test_size):
     from sklearn.model_selection import train_test_split
