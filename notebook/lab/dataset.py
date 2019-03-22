@@ -4,7 +4,7 @@ from mxnet import nd
 from mxnet.gluon import data as gdata
 from mxnet.gluon.data.vision import transforms as gtf
 
-from .datatools import Loader
+from datatools import Loader
 
 def split(X, Y, test_size):
     from sklearn.model_selection import train_test_split
@@ -34,26 +34,6 @@ transform_test = gtf.Compose([
     gtf.ToTensor(),
     gtf.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
-
-
-class SimpleDataset:
-    def __init__(self, name, root='E:/xdata/X.h5'):
-        import tables as tb
-        h5 = tb.open_file(root)
-        self.name = name
-        self._dataset = h5.root[name]
-        self.label_names = self._get_label_names(is_fine_labels=False)
-        self.trainX, self.trainY = self._dataset.trainX[:], self._dataset.trainY[:]
-        self.testX, self.testY = self._dataset.testX[:], self._dataset.testY[:]
-        h5.close()
-
-    def _get_label_names(self, is_fine_labels=False):
-        if self.name != 'cifar100':
-            return np.asanyarray(self._dataset.label_names, dtype='U')
-        elif is_fine_labels:
-            return np.asanyarray(self._dataset.fine_label_names, dtype='U')
-        else:
-            return np.asanyarray(self._dataset.coarse_label_names, dtype='U')
 
 
 class AugLoader(Loader, gdata.Dataset):

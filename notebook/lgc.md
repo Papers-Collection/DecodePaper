@@ -184,8 +184,10 @@ $$
 $t\to \infty$ 可得
 
 $$
-F^* = (1-\alpha)(I-\alpha S)^{-1}Y
+F^* = \beta (I-\alpha S)^{-1}Y
 $$
+
+$\beta=1$, 则表示非正则化的 LLGC, $\beta=1- \alpha$ 则表示正则化的 LLGC.
 
 ### sklearn 算法实现 lgc
 
