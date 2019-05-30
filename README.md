@@ -5,4 +5,7 @@
 如果觉得有用，记得 star 支持！
 
 - [半监督学习](SSL.md)
-- [深度学习论文翻译，包括分类论文，检测论文等](https://github.com/SnailTyan/deep-learning-papers-translation)
+
+## 论文阅读工具
+
+- [死磕论文前，不如先找齐一套好用的工具](https://zhuanlan.zhihu.com/p/49856162)
